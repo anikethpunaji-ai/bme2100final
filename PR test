@@ -1,0 +1,14 @@
+const int sensorPin = A5;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  int lightLevel = analogRead(sensorPin);
+
+  Serial.print("Light level: ");
+  Serial.println(lightLevel);
+
+  delay(200);
+}
