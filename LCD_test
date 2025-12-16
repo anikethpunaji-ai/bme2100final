@@ -22,4 +22,6 @@ void loop() {
 
   tone(buzzer, 1046, 500); // first frequency
   tone(buzzer, 784, 500); // second frequency
+
+  noTone(buzzerPin);
 }
