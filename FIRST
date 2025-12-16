@@ -1,0 +1,69 @@
+#include <LiquidCrystal.h>
+
+// LCD wiring: RS, E, D4, D5, D6, D7
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+const int sensorPin = A5;
+const int buzzerPin = 9;
+
+// Choose this by testing with phone flashlight vs shadow.
+// Start around 700–850, then tune.
+const int THRESHOLD = 800;
+
+const int FREQ_HIGH = 1046;
+const int FREQ_LOW  = 784;
+
+unsigned long lastToggleMs = 0;
+bool highTone = true;
+
+unsigned long lastLcdMs = 0;
+
+void setup() {
+  pinMode(buzzerPin, OUTPUT);
+  lcd.begin(16, 2);
+  lcd.clear();
+}
+
+void loop() {
+  int level = analogRead(sensorPin);   // 0–1023, higher = brighter (with the divider wired as described)
+
+  bool tooBright = (level > THRESHOLD);
+
+  // Update LCD ~10x/sec so it’s responsive but not flickery
+  if (millis() - lastLcdMs >= 100) {
+    lastLcdMs = millis();
+
+    lcd.setCursor(0, 0);
+    lcd.print("Level ");
+    // Clear old digits if number shrinks
+    lcd.print("    ");
+    lcd.setCursor(6, 0);
+    lcd.print(level);
+
+    lcd.setCursor(0, 1);
+    if (tooBright) {
+      lcd.print("TOO BRIGHT       ");
+    } else {
+      lcd.print("                ");
+    }
+  }
+
+  if (tooBright) {
+    // Alternate tones every 500 ms, continuously, no gaps
+    if (millis() - lastToggleMs >= 500) {
+      lastToggleMs = millis();
+      highTone = !highTone;
+      tone(buzzerPin, highTone ? FREQ_HIGH : FREQ_LOW);
+    }
+    // Ensure tone is on even before first 500ms toggle
+    if (lastToggleMs == 0) {
+      lastToggleMs = millis();
+      tone(buzzerPin, FREQ_HIGH);
+    }
+  } else {
+    // Back to normal immediately
+    noTone(buzzerPin);
+    lastToggleMs = 0;
+    highTone = true;
+  }
+}
