@@ -1,11 +1,15 @@
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
+const int buzzer = 9; //buzzer to arduino pin 9
+
 void setup() {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   // Print a message to the LCD.
   lcd.print("hello, world!");
+
+  pinMode(buzzer, OUTPUT);
 }
 
 void loop() {
@@ -15,4 +19,7 @@ void loop() {
   // Turn on the display:
   lcd.display();
   delay(500);
+
+  tone(buzzer, 1046, 500); // first frequency
+  tone(buzzer, 784, 500); // second frequency
 }
